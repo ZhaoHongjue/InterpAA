@@ -25,9 +25,10 @@ class VGGBlock(nn.Module):
     
     
 class VGG(nn.Module):
-    def __init__(self, in_channels, out_channels, conv_arch) -> None:
+    def __init__(self, in_channels, out_channels, use_gap = False) -> None:
         super().__init__()
         vgg_blks = []
+        conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
         for (num_convs, mid_channels) in conv_arch:
             vgg_blks.append(VGGBlock(num_convs, in_channels, mid_channels))
             in_channels = mid_channels
