@@ -1,5 +1,7 @@
 __pycache__
 .vscode
+*.out
 data
 test.*
 results
+wandb

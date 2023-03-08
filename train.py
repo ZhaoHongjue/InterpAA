@@ -11,6 +11,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', default = 0.0001, type = float)
     parser.add_argument('--epochs', default = 100, type = int)
     parser.add_argument('--seed', default = 1, type = int)
+    parser.add_argument('--cuda', default = 0, type = int)
     parser.add_argument('--use_gap', action = 'store_true')
     parser.add_argument('--use_wandb', action = 'store_true')
     args = parser.parse_args()

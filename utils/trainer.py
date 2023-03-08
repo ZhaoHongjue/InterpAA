@@ -19,6 +19,7 @@ class Trainer:
         batch_size: int = 128,          # batch size during training
         lr: float = 1e-4,               # learning rate for optimizer
         seed: int = 0,                  # the random seed
+        cuda: int = 0,                  # cuda index
         use_gap: bool = False,          # whether to use Global Avg Pooling
         use_wandb: bool = False,        # whether to use weights & bias to monitor whole process
         **kwargs
@@ -42,7 +43,7 @@ class Trainer:
         self.loss_fn = nn.CrossEntropyLoss(reduction = 'mean')
         self.opt = torch.optim.Adam(self.model.parameters(), lr = lr)
         self.train_iter, self.test_iter = generate_data_iter(dataset, batch_size, seed)
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device(f'cuda:{cuda}' if torch.cuda.is_available() else 'cpu')
         
         logging.basicConfig(
             filename = self.log_pth + self.model_name + '.log', 
@@ -52,7 +53,7 @@ class Trainer:
             try:
                 import wandb
                 self.use_wandb = True
-                wand.init(
+                wandb.init(
                     project = 'Interp-AA',
                     name = self.model_name,
                     config = {
