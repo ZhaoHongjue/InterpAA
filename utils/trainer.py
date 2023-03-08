@@ -48,6 +48,25 @@ class Trainer:
             filename = self.log_pth + self.model_name + '.log', 
             level = logging.INFO
         )
+        if use_wandb:
+            try:
+                import wandb
+                self.use_wandb = True
+                wand.init(
+                    project = 'Interp-AA',
+                    name = self.model_name,
+                    config = {
+                        'model_mode': model_name,
+                        'dataset': dataset,
+                        'batch_size': batch_size,
+                        'lr': lr,
+                        'seed': seed,
+                        'use_gap': use_gap
+                    }
+                )
+            except:
+                print('import wandb fail!')
+                self.use_wandb = False
         
     def fit(self, epochs: int = 100):
         set_random_seed(self.seed)
@@ -78,7 +97,17 @@ class Trainer:
                 
             for metric in list(metrics.keys()):
                 metrics[metric].append(eval(metric))
-                
+            
+            if self.use_wandb:
+                import wandb
+                wandb.log({
+                    'epoch': epoch,
+                    'train_loss': train_loss,
+                    'test_loss': test_loss,
+                    'train_acc': train_acc,
+                    'test_acc': test_acc
+                })
+            
             if epoch % 10 == 0:
                 pd.DataFrame(metrics).to_csv(
                     self.metric_pth + self.model_name + '.csv'
