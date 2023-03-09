@@ -1,8 +1,6 @@
 import torch
 from torch import nn
 
-from .__GAP__ import GlobalAvgPool2d
-
 class AlexNet(nn.Module):
     def __init__(
         self, 
@@ -32,7 +30,10 @@ class AlexNet(nn.Module):
         self.maxpool3 = nn.MaxPool2d(kernel_size = 2, padding = 1)
         
         if use_gap:
-            self.gap = GlobalAvgPool2d()
+            self.gap = nn.Sequential(
+                nn.AdaptiveAvgPool2d((1, 1)),
+                nn.Flatten()
+            )
             self.fc = nn.Linear(128, out_channels)
         else:
             self.flatten = nn.Flatten()
@@ -46,14 +47,17 @@ class AlexNet(nn.Module):
         self.apply(initialize)
         
     def forward(self, X):
-        Y = self.maxpool1(self.relu1(self.conv1(X)))
-        Y = self.maxpool2(self.relu2(self.conv2(Y)))
-        Y = self.relu3(self.conv3(Y))
-        Y = self.relu4(self.conv4(Y))
-        Y = self.maxpool3(self.relu5(self.conv5(Y)))
-        if hasattr(self, 'gap'):
-            Y = self.gap(Y)
-        else:
-            Y = self.flatten(Y)
-        Y = self.fc(Y)
-        return Y    
+        # Y = self.maxpool1(self.relu1(self.conv1(X)))
+        # Y = self.maxpool2(self.relu2(self.conv2(Y)))
+        # Y = self.relu3(self.conv3(Y))
+        # Y = self.relu4(self.conv4(Y))
+        # Y = self.maxpool3(self.relu5(self.conv5(Y)))
+        # if hasattr(self, 'gap'):
+        #     Y = self.gap(Y)
+        # else:
+        #     Y = self.flatten(Y)
+        # Y = self.fc(Y)
+        # return Y 
+        for module in self.children():
+            X = module(X)
+        return X   

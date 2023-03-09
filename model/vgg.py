@@ -17,7 +17,7 @@ class VGGBlock(nn.Module):
             ))
             layers.append(nn.ReLU())
             in_channels = out_channels
-        layers.append(nn.MaxPool2d(kernel_size = 2,stride = 2))
+        layers.append(nn.MaxPool2d(kernel_size = 2, stride = 2))
         self.seq = nn.Sequential(*layers)
         
     def forward(self, X):
@@ -25,23 +25,35 @@ class VGGBlock(nn.Module):
     
     
 class VGG(nn.Module):
-    def __init__(self, in_channels, out_channels, use_gap = False) -> None:
+    def __init__(self, in_channels, out_channels, conv_arch, use_gap = False) -> None:
         super().__init__()
         vgg_blks = []
-        conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
-        for (num_convs, mid_channels) in conv_arch:
-            vgg_blks.append(VGGBlock(num_convs, in_channels, mid_channels))
+        
+        for idx, (num_convs, mid_channels) in enumerate(conv_arch):
+            self.add_module(f'vgg_blk{idx+1}', VGGBlock(num_convs, in_channels, mid_channels))
             in_channels = mid_channels
             
-        self.seq = nn.Sequential(
-            *vgg_blks, nn.Flatten(),
-            nn.Linear(512, 1024), nn.ReLU(), nn.Dropout(0.5),
-            nn.Linear(1024, 1024), nn.ReLU(), nn.Dropout(0.5),
-            nn.Linear(1024, out_channels)
-        )
+        if use_gap:
+            self.gap = nn.Sequential(
+                nn.AdaptiveAvgPool2d((1, 1)),
+                nn.Flatten()
+            )
+            self.fc = nn.Linear(conv_arch[-1][1], out_channels)
+        else:
+            self.flatten = nn.Flatten()
+            self.fc = nn.LazyLinear(out_channels)
+        
+        # self.seq = nn.Sequential(
+        #     *vgg_blks, nn.Flatten(),
+        #     nn.Linear(512, 1024), nn.ReLU(), nn.Dropout(0.5),
+        #     nn.Linear(1024, 1024), nn.ReLU(), nn.Dropout(0.5),
+        #     nn.Linear(1024, out_channels)
+        # )
         
     def forward(self, X):
-        return self.seq(X)
+        for module in self.children():
+            X = module(X)
+        return X
     
 if __name__ == '__main__':
     X = torch.rand((128, 3, 32, 32))
