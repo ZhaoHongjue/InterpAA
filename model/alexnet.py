@@ -14,14 +14,14 @@ class AlexNet(nn.Module):
         super().__init__()
         
         self.conv1 = nn.Conv2d(
-            in_channels, 32, kernel_size = 3, padding = 1
+            in_channels, 64, kernel_size = 3, padding = 1
         )
         self.relu1 = nn.ReLU()
         self.maxpool1 = nn.MaxPool2d(kernel_size = 2, padding = 1)
         
         self.conv2 = nn.Conv2d(32, 64, kernel_size = 3, padding = 1)
         self.relu2 = nn.ReLU()
-        self.maxpool2 = nn.MaxPool2d(kernel_size = 3, padding = 1)
+        self.maxpool2 = nn.MaxPool2d(kernel_size = 2, padding = 1)
         
         self.conv3 = nn.Conv2d(64, 128, kernel_size = 3, padding = 1)
         self.relu3 = nn.ReLU()
@@ -47,7 +47,7 @@ class AlexNet(nn.Module):
         
     def forward(self, X):
         Y = self.maxpool1(self.relu1(self.conv1(X)))
-        Y = self.maxpool2(self.relu2(self.conv2(Y)))
+        # Y = self.maxpool2(self.relu2(self.conv2(Y)))
         Y = self.relu3(self.conv3(Y))
         Y = self.relu4(self.conv4(Y))
         Y = self.maxpool3(self.relu5(self.conv5(Y)))

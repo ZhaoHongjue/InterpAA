@@ -6,7 +6,7 @@ do
         do
             for lr in 0.0001
             do
-                for epochs in 100
+                for epochs in 250
                 do
                     for seed in 0 1 2 3 4
                     do
