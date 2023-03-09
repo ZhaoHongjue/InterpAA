@@ -47,7 +47,7 @@ class AlexNet(nn.Module):
         
     def forward(self, X):
         Y = self.maxpool1(self.relu1(self.conv1(X)))
-        # Y = self.maxpool2(self.relu2(self.conv2(Y)))
+        Y = self.maxpool2(self.relu2(self.conv2(Y)))
         Y = self.relu3(self.conv3(Y))
         Y = self.relu4(self.conv4(Y))
         Y = self.maxpool3(self.relu5(self.conv5(Y)))
