@@ -14,7 +14,7 @@ from .basic import *
 class Trainer:
     def __init__(
         self, 
-        model_name: str = 'AlexNet',    # which model you would like to use
+        model_mode: str = 'AlexNet',    # which model you would like to use
         dataset: str = 'CIFAR10',       # which dataset you would like to use
         batch_size: int = 128,          # batch size during training
         lr: float = 1e-4,               # learning rate for optimizer
@@ -34,10 +34,10 @@ class Trainer:
         - `use_gap`: whether to use Global Avg Pooling
         - `use_wandb`: whether to use weights & bias to monitor whole process
         '''
-        self.seed, self.dataset = seed, dataset
+        self.seed, self.model_mode, self.dataset = seed, model_mode, dataset
         set_random_seed(seed)
-        self.model: nn.Module = eval(model_name)(use_gap = use_gap, **load_yaml(dataset))
-        self.model_name = f'{model_name}-{dataset}-bs{batch_size}-lr{lr}-seed{seed}'
+        self.model: nn.Module = eval(model_mode)(use_gap = use_gap, **load_yaml(dataset))
+        self.model_name = f'{model_mode}-{dataset}-bs{batch_size}-lr{lr}-seed{seed}'
         self.makedirs()
         
         self.loss_fn = nn.CrossEntropyLoss(reduction = 'mean')
@@ -57,7 +57,7 @@ class Trainer:
                     project = 'Interp-AA',
                     name = self.model_name,
                     config = {
-                        'model_mode': model_name,
+                        'model_mode': model_mode,
                         'dataset': dataset,
                         'batch_size': batch_size,
                         'lr': lr,
@@ -153,7 +153,7 @@ class Trainer:
         self.model.load_state_dict(torch.load(load_pth, map_location = 'cpu'))    
     
     def makedirs(self):
-        self.results_pth = f'./results/{self.dataset}/'
+        self.results_pth = f'./results/{self.dataset}/{self.model_mode}'
         self.model_pth = f'{self.results_pth}/models/'
         self.metric_pth = f'{self.results_pth}/metrics/'
         self.log_pth = f'{self.results_pth}/logs/'

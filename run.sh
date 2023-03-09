@@ -1,14 +1,14 @@
 for model_name in AlexNet
 do
-    for dataset in FashionMNIST CIFAR10
+    for dataset in FashionMNIST
     do
         for batch_size in 128
         do
             for lr in 0.0001
             do
-                for epochs in 20
+                for epochs in 100
                 do
-                    for seed in 0 1 2
+                    for seed in 0 1 2 3 4
                     do
                         for cuda in 2
                         do

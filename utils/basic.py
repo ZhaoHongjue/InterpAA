@@ -51,7 +51,7 @@ def generate_data_iter(dataset: str, batch_size: int = 128, seed: int = 0):
         os.makedirs(data_pth)
         
     transform = transforms.Compose([
-        transforms.AutoAugment(),
+        # transforms.AutoAugment(),
         transforms.ToTensor(), # numpy -> Tensor
         # transforms.Normalize(0.5, 0.5)
     ])
