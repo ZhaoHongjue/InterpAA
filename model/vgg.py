@@ -7,7 +7,7 @@ import torch
 from torch import nn
 
 class VGGBlock(nn.Module):
-    def __init__(self, num_convs, in_channels, out_channels) -> None:
+    def __init__(self, num_convs: int, in_channels: int, out_channels: int) -> None:
         super().__init__()
         layers = []
         for _ in range(num_convs):
@@ -25,7 +25,7 @@ class VGGBlock(nn.Module):
     
     
 class VGG(nn.Module):
-    def __init__(self, in_channels, out_channels, conv_arch, use_gap = False) -> None:
+    def __init__(self, in_channels: int, out_channels: int, conv_arch, use_gap: bool = False) -> None:
         super().__init__()
         vgg_blks = []
         
@@ -42,13 +42,6 @@ class VGG(nn.Module):
         else:
             self.flatten = nn.Flatten()
             self.fc = nn.LazyLinear(out_channels)
-        
-        # self.seq = nn.Sequential(
-        #     *vgg_blks, nn.Flatten(),
-        #     nn.Linear(512, 1024), nn.ReLU(), nn.Dropout(0.5),
-        #     nn.Linear(1024, 1024), nn.ReLU(), nn.Dropout(0.5),
-        #     nn.Linear(1024, out_channels)
-        # )
         
     def forward(self, X):
         for module in self.children():

@@ -1,14 +1,14 @@
-for model_name in VGG
+for model_name in ResNet
 do
-    for dataset in CIFAR10 FashionMNIST
+    for dataset in CIFAR10
     do
         for batch_size in 128
         do
             for lr in 0.0001
             do
-                for epochs in 250
+                for epochs in 15
                 do
-                    for seed in 0 1 2 3 4
+                    for seed in 0
                     do
                         for cuda in 2
                         do
