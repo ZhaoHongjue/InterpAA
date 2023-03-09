@@ -14,7 +14,7 @@ class AlexNet(nn.Module):
         super().__init__()
         
         self.conv1 = nn.Conv2d(
-            in_channels, 64, kernel_size = 3, padding = 1
+            in_channels, 32, kernel_size = 3, padding = 1
         )
         self.relu1 = nn.ReLU()
         self.maxpool1 = nn.MaxPool2d(kernel_size = 2, padding = 1)
