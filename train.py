@@ -5,7 +5,7 @@ import utils
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Basic Settings')
-    parser.add_argument('--model_name', default = 'AlexNet')
+    parser.add_argument('--model_mode', default = 'AlexNet')
     parser.add_argument('--dataset', default = 'FashionMNIST')
     parser.add_argument('--batch_size', default = 128, type = int)
     parser.add_argument('--lr', default = 0.0001, type = float)

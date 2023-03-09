@@ -1,6 +1,6 @@
-for model_name in AlexNet
+for model_name in VGG
 do
-    for dataset in FashionMNIST
+    for dataset in CIFAR10 FashionMNIST
     do
         for batch_size in 128
         do
@@ -13,7 +13,7 @@ do
                         for cuda in 2
                         do
                             nohup python train.py       \
-                            --model_name    $model_name \
+                            --model_mode    $model_name \
                             --dataset       $dataset    \
                             --batch_size    $batch_size \
                             --lr            $lr         \
