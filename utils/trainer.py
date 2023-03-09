@@ -36,7 +36,9 @@ class Trainer:
         '''
         self.seed, self.model_mode, self.dataset = seed, model_mode, dataset
         set_random_seed(seed)
-        self.model: nn.Module = eval(model_mode)(use_gap = use_gap, **load_yaml(dataset))
+        self.model: nn.Module = eval(model_mode)(
+            use_gap = use_gap, **load_yaml(model_mode, dataset)
+        )
         self.model_name = f'{model_mode}-{dataset}-bs{batch_size}-lr{lr}-seed{seed}'
         self.makedirs()
         

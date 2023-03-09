@@ -34,12 +34,12 @@ def set_random_seed(seed: int):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
 
-def load_yaml(dataset: str):
+def load_yaml(model_mode: str, dataset: str):
     with open('config.yaml', encoding = 'utf-8') as file:
         content = file.read()
     
     config = yaml.load(content, Loader = yaml.FullLoader)
-    return  config[dataset]
+    return  config[dataset][model_mode]
 
 def generate_data_iter(dataset: str, batch_size: int = 128, seed: int = 0):
     '''

@@ -1,11 +1,14 @@
 CIFAR10:
-  in_channels: 3
-  out_channels: 10
+  AlexNet:
+    in_channels: 3
+    out_channels: 10
 
 CIFAR100:
-  in_channels: 3
-  out_channels: 100
+  AlexNet:
+    in_channels: 3
+    out_channels: 100
 
 FashionMNIST:
-  in_channels: 1
-  out_channels: 10
+  AlexNet:
+    in_channels: 1
+    out_channels: 10
