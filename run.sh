@@ -1,6 +1,6 @@
 for model_name in AlexNet
 do
-    for dataset in CIFAR10
+    for dataset in FashionMNIST
     do
         for batch_size in 128
         do

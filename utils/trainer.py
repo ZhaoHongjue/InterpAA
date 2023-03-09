@@ -70,6 +70,8 @@ class Trainer:
             except:
                 print('import wandb fail!')
                 self.use_wandb = False
+        else:
+            self.use_wandb = False
         
     def fit(self, epochs: int = 100):
         set_random_seed(self.seed)
