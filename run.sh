@@ -12,7 +12,7 @@ do
                     do
                         for cuda in 2
                         do
-                            nohup python train.py      \
+                            nohup python train.py       \
                             --model_name    $model_name \
                             --dataset       $dataset    \
                             --batch_size    $batch_size \
