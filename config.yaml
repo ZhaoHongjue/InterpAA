@@ -1,35 +1,3 @@
-CIFAR10:
-  AlexNet:
-    in_channels: 3
-    out_channels: 10
-  VGG:
-    in_channels: 3
-    out_channels: 10
-    conv_arch: [[3, 64], [3, 128], [3, 256]]
-  ResNet:
-    in_channels: 3
-    out_channels: 10
-
-CIFAR100:
-  AlexNet:
-    in_channels: 3
-    out_channels: 100
-  VGG:
-    in_channels: 3
-    out_channels: 10
-    conv_arch: [[3, 64], [4, 128], [4, 256]]
-  ResNet:
-    in_channels: 3
-    out_channels: 100
-
-FashionMNIST:
-  AlexNet:
-    in_channels: 1
-    out_channels: 10
-  VGG:
-    in_channels: 1
-    out_channels: 10
-    conv_arch: [[3, 64], [2, 128], [3, 256]]
-  ResNet:
-    in_channels: 1
-    out_channels: 10
+CIFAR10: 10
+CIFAR100: 100
+imagenette: 10

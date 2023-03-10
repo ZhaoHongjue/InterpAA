@@ -35,12 +35,12 @@ def set_random_seed(seed: int):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
 
-def load_yaml(model_mode: str, dataset: str):
+def load_yaml(dataset: str):
     with open('config.yaml', encoding = 'utf-8') as file:
         content = file.read()
     
     config = yaml.load(content, Loader = yaml.FullLoader)
-    return  config[dataset][model_mode]
+    return  config[dataset]
 
 def generate_data_iter(dataset: str, batch_size: int = 128, seed: int = 0):
     '''
@@ -104,6 +104,19 @@ def get_correct_num(Y: torch.Tensor, Y_hat: torch.Tensor):
             Y_hat = Y_hat.argmax(dim = 1)
         cmp = Y_hat.type(Y.dtype) == Y
         return float(cmp.type(Y.dtype).sum())
+
+def test_accuracy(model: nn.Module, data_iter):
+    accu = Accumulator(2)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
+    with torch.no_grad():
+        for X, Y in data_iter:
+            X, Y = X.to(device), Y.to(device)
+            Y_hat = model(X)
+            accu.add(get_correct_num(Y, Y_hat), len(Y))
+    model.cpu()
+    return accu[0] / accu[1] * 100
+            
 
 def imshow(img: torch.Tensor):
     '''

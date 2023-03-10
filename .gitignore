@@ -5,3 +5,4 @@ data
 test.*
 results
 wandb
+cam_test.ipynb
