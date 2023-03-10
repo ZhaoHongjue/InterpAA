@@ -2,8 +2,9 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.utils import data
+
 import torchvision
-import torchvision.transforms as transforms
+from torchvision import datasets, transforms
 from torchvision.datasets import CIFAR10, CIFAR100, FashionMNIST
 
 import numpy as np
@@ -49,26 +50,40 @@ def generate_data_iter(dataset: str, batch_size: int = 128, seed: int = 0):
     data_pth = f'./data/{dataset}'
     if not os.path.exists(data_pth):
         os.makedirs(data_pth)
-        
-    transform = transforms.Compose([
-        transforms.Resize(224),
-        transforms.AutoAugment(),
-        transforms.ToTensor(), # numpy -> Tensor
-    ])
     
-    train_set = eval(dataset)(
-        root = data_pth,
-        train = True,
-        download = True,
-        transform = transform
-    )
+    if 'CIFAR' in dataset:
+        transform = transforms.Compose([
+            transforms.Resize(224),
+            transforms.AutoAugment(),
+            transforms.ToTensor(), # numpy -> Tensor
+        ])
+        train_set = eval(dataset)(
+            root = data_pth,
+            train = True,
+            download = True,
+            transform = transform
+        )
+        test_set = eval(dataset)(
+            root = data_pth,
+            train = False,
+            download = True,
+            transform = transform
+        )
     
-    test_set = eval(dataset)(
-        root = data_pth,
-        train = False,
-        download = True,
-        transform = transform
-    )
+    elif dataset == 'imagenette':
+        transform = transforms.Compose([
+            transforms.CenterCrop(160),
+            transforms.AutoAugment(),
+            transforms.ToTensor(), # numpy -> Tensor
+        ])
+        train_set = datasets.ImageFolder(
+            './data/imagenette2-160/train/',
+            transform = transform
+        )
+        test_set = datasets.ImageFolder(
+            './data/imagenette2-160/val/',
+            transform = transform
+        )
     
     train_iter = data.DataLoader(
         train_set, 
