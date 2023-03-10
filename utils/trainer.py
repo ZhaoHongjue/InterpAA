@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import timm
 
 import numpy as np
 import pandas as pd
@@ -8,19 +9,17 @@ import os
 import logging
 import time
 
-from model import *
 from .basic import *
 
 class Trainer:
     def __init__(
         self, 
-        model_mode: str = 'AlexNet',    # which model you would like to use
+        resnet_mode: str = 'resnet18',    # which model you would like to use
         dataset: str = 'CIFAR10',       # which dataset you would like to use
         batch_size: int = 128,          # batch size during training
         lr: float = 1e-4,               # learning rate for optimizer
         seed: int = 0,                  # the random seed
         cuda: int = 0,                  # cuda index
-        use_gap: bool = False,          # whether to use Global Avg Pooling
         use_wandb: bool = False,        # whether to use weights & bias to monitor whole process
         **kwargs
     ) -> None:
@@ -31,19 +30,23 @@ class Trainer:
         - `batch_size`: batch size during training
         - `lr`: learning rate for optimizer
         - `seed`: the random seed
-        - `use_gap`: whether to use Global Avg Pooling
+        - `cuda`: cuda index
         - `use_wandb`: whether to use weights & bias to monitor whole process
         '''
-        self.seed, self.model_mode, self.dataset = seed, model_mode, dataset
+        if resnet_mode not in timm.list_models('resnet*'):
+            raise ValueError('This is not suitable model!')
+        self.seed, self.resnet_mode, self.dataset = seed, resnet_mode, dataset
         set_random_seed(seed)
-        self.model: nn.Module = eval(model_mode)(
-            use_gap = use_gap, **load_yaml(model_mode, dataset)
-        )
-        self.model_name = f'{model_mode}-{dataset}-bs{batch_size}-lr{lr}-seed{seed}'
+        self.model: nn.Module = timm.create_model(resnet_mode, pretrained = True)
+        self.model_name = f'{resnet_mode}-{dataset}-bs{batch_size}-lr{lr}-seed{seed}'
         self.makedirs()
         
         self.loss_fn = nn.CrossEntropyLoss(reduction = 'mean')
         self.opt = torch.optim.Adam(self.model.parameters(), lr = lr)
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            self.opt, 'max', factor = 0.3, patience = 1
+        )
+        
         self.train_iter, self.test_iter = generate_data_iter(dataset, batch_size, seed)
         self.device = torch.device(f'cuda:{cuda}' if torch.cuda.is_available() else 'cpu')
         
@@ -59,12 +62,11 @@ class Trainer:
                     project = 'Interp-AA',
                     name = self.model_name,
                     config = {
-                        'model_mode': model_mode,
+                        'resnet_mode': resnet_mode,
                         'dataset': dataset,
                         'batch_size': batch_size,
                         'lr': lr,
                         'seed': seed,
-                        'use_gap': use_gap
                     }
                 )
             except:
@@ -90,6 +92,7 @@ class Trainer:
             start = time.time()
             train_loss, train_acc = self.train_epoch()
             test_loss, test_acc = self.test_epoch()
+            self.scheduler.step(test_acc)
             final = time.time()
             
             if test_acc > max_acc:
@@ -157,7 +160,7 @@ class Trainer:
         self.model.load_state_dict(torch.load(load_pth, map_location = 'cpu'))    
     
     def makedirs(self):
-        self.results_pth = f'./results/{self.dataset}/{self.model_mode}'
+        self.results_pth = f'./results/{self.dataset}/{self.resnet_mode}'
         self.model_pth = f'{self.results_pth}/models/'
         self.metric_pth = f'{self.results_pth}/metrics/'
         self.log_pth = f'{self.results_pth}/logs/'

@@ -5,14 +5,13 @@ import utils
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Basic Settings')
-    parser.add_argument('--model_mode', default = 'AlexNet')
-    parser.add_argument('--dataset', default = 'FashionMNIST')
+    parser.add_argument('--resnet_mode', default = 'resnet18')
+    parser.add_argument('--dataset', default = 'CIFAR10')
     parser.add_argument('--batch_size', default = 128, type = int)
     parser.add_argument('--lr', default = 0.0001, type = float)
     parser.add_argument('--epochs', default = 10, type = int)
     parser.add_argument('--seed', default = 0, type = int)
     parser.add_argument('--cuda', default = 0, type = int)
-    parser.add_argument('--use_gap', action = 'store_true')
     parser.add_argument('--use_wandb', action = 'store_true')
     args = parser.parse_args()
     print(tabulate(

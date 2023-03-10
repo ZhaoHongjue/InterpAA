@@ -51,9 +51,9 @@ def generate_data_iter(dataset: str, batch_size: int = 128, seed: int = 0):
         os.makedirs(data_pth)
         
     transform = transforms.Compose([
-        # transforms.AutoAugment(),
+        transforms.Resize(224),
+        transforms.AutoAugment(),
         transforms.ToTensor(), # numpy -> Tensor
-        # transforms.Normalize(0.5, 0.5)
     ])
     
     train_set = eval(dataset)(
@@ -94,7 +94,7 @@ def imshow(img: torch.Tensor):
     '''
     show the pic
     '''
-    img = img / 2 + 0.5 # reverse normalization
+    # img = img / 2 + 0.5 # reverse normalization
     np_img = img.numpy()  # tensor --> numpy
     plt.imshow(np.transpose(np_img, (1, 2, 0)))
     plt.show()
