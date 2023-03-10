@@ -44,7 +44,7 @@ class Trainer:
         self.loss_fn = nn.CrossEntropyLoss(reduction = 'mean')
         self.opt = torch.optim.Adam(self.model.parameters(), lr = lr)
         self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            self.opt, 'max', factor = 0.3, patience = 1
+            self.opt, 'max', factor = 0.1, patience = 1
         )
         
         self.train_iter, self.test_iter = generate_data_iter(dataset, batch_size, seed)
