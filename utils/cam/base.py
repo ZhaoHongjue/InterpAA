@@ -22,10 +22,12 @@ class BaseCAM:
         use_relu: bool = False,
         use_cuda: bool = True
     ) -> None:
+        # set basic attributes
         self.model = model
         self.use_relu = use_relu
         layer_names = self._get_layer_names()
         
+        # Error detect
         if target_layer not in layer_names:
             raise AttributeError(
                 f'Model has no attribute `{target_layer}`!'
@@ -60,28 +62,42 @@ class BaseCAM:
         self.target_layer = target_layer
     
     def __call__(
-        self, img: Image.Image, mask_rate: float = 0.4, 
-        centercrop: int = None, resize: int = None,
-    ) -> Image.Image:
+        self, 
+        img: Image.Image, 
+        mask_rate: float = 0.4, 
+        centercrop: int = None
+    ) -> np.ndarray:
+        # process image
+        # to np.ndarray
         img_np = np.array(img)
         
-        tfm_lst = []
+        # to torch.Tensor
+        tfm_lst = [
+            transforms.Resize(224),
+            transforms.ToTensor()
+        ]
         if centercrop:
-            tfm_lst.append(transforms.CenterCrop(centercrop))
-        if resize:
-            tfm_lst.append(transforms.Resize(resize))
-        tfm_lst.append(transforms.ToTensor())
+            tfm_lst.insert(0, transforms.CenterCrop(centercrop))
+        
         tfms = transforms.Compose(tfm_lst)
         img_tensor: torch.Tensor = tfms(img).unsqueeze(0)
         img_tensor = img_tensor.to(self.device)
         
+        # get result of classification
+        with torch.no_grad():
+            logits = self.model(img_tensor)
+            probs = F.softmax(logits, dim = 1)
+            class_idx, prob = probs.argmax().item(), probs.max().item()
+        
+        # generate heatmap
         weights: torch.Tensor = self._get_weights(img_tensor)
         featuremaps: torch.Tensor = self._get_feature_maps(img_tensor).squeeze(0)
         raw_heatmap: torch.Tensor = (weights * featuremaps).sum(dim = 0)
+        
         if self.use_relu:
             raw_heatmap = F.relu(raw_heatmap)
         raw_heatmap = raw_heatmap.cpu().numpy()
-        return _get_result(raw_heatmap, img_np, mask_rate)
+        return _get_result(raw_heatmap, img_np, mask_rate), class_idx, prob
     
     @torch.no_grad()
     def _get_feature_maps(self, img_tensor: torch.Tensor) -> torch.Tensor:

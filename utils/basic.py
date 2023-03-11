@@ -73,6 +73,7 @@ def generate_data_iter(dataset: str, batch_size: int = 128, seed: int = 0):
     elif dataset == 'imagenette':
         transform = transforms.Compose([
             transforms.CenterCrop(160),
+            transforms.Resize(224),
             transforms.AutoAugment(),
             transforms.ToTensor(), # numpy -> Tensor
         ])

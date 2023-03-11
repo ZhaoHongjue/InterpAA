@@ -1,0 +1,6 @@
+class_names = {
+    'imagenette': (
+        'tench', 'English springer', 'cassette player', 'chain saw', 'church', 
+        'French horn', 'garbage truck', 'gas pump', 'golf ball', 'parachute'
+    )
+}

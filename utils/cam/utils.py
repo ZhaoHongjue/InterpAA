@@ -6,16 +6,21 @@ import torch
 from torch import nn
 
 import numpy as np
+import matplotlib.pyplot as plt
 import cv2
 
 from typing import Iterable, Dict, Callable
 from PIL import Image
 
+from .settings import *
+
+plt.rcParams['figure.figsize'] = (5, 5)
+
 def _get_result(
         raw_heatmap: np.ndarray, 
         img_np: np.ndarray, 
         mask_rate: float = 0.4
-    ) -> Image.Image:
+    ) -> np.ndarray:
         raw_max, raw_min = raw_heatmap.max(), raw_heatmap.min()
         raw_heatmap = (raw_heatmap - raw_min) / (raw_max - raw_min)
         raw_heatmap = np.uint8(raw_heatmap * 255)
@@ -25,9 +30,26 @@ def _get_result(
         )
         heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)  
         
-        cam = np.uint8(img_np * (1 - mask_rate) + heatmap * mask_rate)
-        cam_img = Image.fromarray(cam)
-        return cam_img
+        cam_img_np = np.uint8(img_np * (1 - mask_rate) + heatmap * mask_rate)
+        return cam_img_np
+
+def plot_cam_img(
+    cam_img_np: np.ndarray, dataset: str, class_idx: int, 
+    prob: float, save_pth: str = None
+) -> None:
+    plt.clf()
+    class_name = class_names[dataset][class_idx]
+    plt.imshow(cam_img_np)
+    if 0 <= prob <= 1:
+        prob *= 100
+    plt.title(f'{class_name} {prob:4.2f}%', fontsize = 22)
+    plt.axis('off')
+    
+    if save_pth:
+        plt.savefig(save_pth, bbox_inches = 'tight', pad_inches = 0.03)
+    else:
+        plt.show()
+    
 
 class VerboseExe:
     def __init__(self, model: nn.Module) -> None:
